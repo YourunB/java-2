@@ -1,10 +1,14 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.sql.*;
 
 public class Form {
 
   public static void main(String[] args) {
+    // Данные для подключения к базе данных (Windows Authentication)
+    String url = "jdbc:sqlserver://localhost:1433;databaseName=TestJavaDB;integratedSecurity=true"; // обновил название базы данных
+
     // Создание окна (формы)
     JFrame frame = new JFrame("Форма с таблицей");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -14,15 +18,26 @@ public class Form {
     // Заголовки столбцов
     String[] columnNames = {"ID", "Имя", "Возраст"};
 
-    // Данные таблицы
-    Object[][] data = {
-        {1, "тест", 11},
-        {2, "тест1", 22},
-        {3, "тест2", 33}
-    };
-
     // Модель таблицы
-    DefaultTableModel model = new DefaultTableModel(data, columnNames);
+    DefaultTableModel model = new DefaultTableModel(columnNames, 0); // создаем пустую модель
+
+    // Попытка подключения к базе данных
+    try (Connection connection = DriverManager.getConnection(url)) {
+      // Запрос к базе данных
+      String sql = "SELECT id, name, age FROM users";  // пример запроса
+      Statement statement = connection.createStatement();
+      ResultSet resultSet = statement.executeQuery(sql);
+
+      // Заполнение модели данными из базы данных
+      while (resultSet.next()) {
+        int id = resultSet.getInt("id");
+        String name = resultSet.getString("name");
+        int age = resultSet.getInt("age");
+        model.addRow(new Object[]{id, name, age});
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
 
     // Создание JTable
     JTable table = new JTable(model);
