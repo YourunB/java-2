@@ -6,8 +6,10 @@ import java.sql.*;
 public class Form {
 
   public static void main(String[] args) {
-    // Данные для подключения к базе данных (Windows Authentication)
-    String url = "jdbc:sqlserver://localhost:1433;databaseName=TestJavaDB;integratedSecurity=true"; // обновил название базы данных
+    // Данные для подключения к базе данных (SQL Authentication)
+    String url = "jdbc:sqlserver://localhost:1433;databaseName=TestJavaDB;encrypt=true;trustServerCertificate=true";
+    String user = "yury";
+    String password = "yuryadmin";
 
     // Создание окна (формы)
     JFrame frame = new JFrame("Форма с таблицей");
@@ -22,9 +24,9 @@ public class Form {
     DefaultTableModel model = new DefaultTableModel(columnNames, 0); // создаем пустую модель
 
     // Попытка подключения к базе данных
-    try (Connection connection = DriverManager.getConnection(url)) {
+    try (Connection connection = DriverManager.getConnection(url, user, password)) {
       // Запрос к базе данных
-      String sql = "SELECT id, name, age FROM users";  // пример запроса
+      String sql = "SELECT id, name, age FROM [user]";  // пример запроса
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
 
