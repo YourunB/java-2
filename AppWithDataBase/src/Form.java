@@ -18,7 +18,7 @@ public class Form {
     frame.setLocationRelativeTo(null); // центрирование
 
     // Заголовки столбцов
-    String[] columnNames = {"ID", "Имя", "Возраст"};
+    String[] columnNames = {"ID", "Имя", "Возраст", "Образование", "Работа"};
 
     // Модель таблицы
     DefaultTableModel model = new DefaultTableModel(columnNames, 0); // создаем пустую модель
@@ -26,7 +26,7 @@ public class Form {
     // Попытка подключения к базе данных
     try (Connection connection = DriverManager.getConnection(url, user, password)) {
       // Запрос к базе данных
-      String sql = "SELECT id, name, age FROM [user]";  // пример запроса
+      String sql = "SELECT id, name, age, education, works FROM [user]";  // пример запроса
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
 
@@ -35,7 +35,9 @@ public class Form {
         int id = resultSet.getInt("id");
         String name = resultSet.getString("name");
         int age = resultSet.getInt("age");
-        model.addRow(new Object[]{id, name, age});
+        String education = resultSet.getString("education");
+        String works = resultSet.getString("works");
+        model.addRow(new Object[]{id, name, age, education, works});
       }
     } catch (SQLException e) {
       e.printStackTrace();
