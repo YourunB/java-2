@@ -1,36 +1,52 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.*;
 import java.sql.*;
 
 public class Form {
 
   public static void main(String[] args) {
-    // Данные для подключения к базе данных (SQL Authentication)
     String url = "jdbc:sqlserver://localhost:1433;databaseName=TestJavaDB;encrypt=true;trustServerCertificate=true";
     String user = "yury";
     String password = "yuryadmin";
 
-    // Создание окна (формы)
     JFrame frame = new JFrame("Форма с таблицей");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(500, 300);
-    frame.setLocationRelativeTo(null); // центрирование
+    frame.setSize(700, 400);
+    frame.setLocationRelativeTo(null);
 
-    // Заголовки столбцов
     String[] columnNames = {"ID", "Имя", "Возраст", "Образование", "Работа"};
+    DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+    JTable table = new JTable(model);
+    JScrollPane scrollPane = new JScrollPane(table);
 
-    // Модель таблицы
-    DefaultTableModel model = new DefaultTableModel(columnNames, 0); // создаем пустую модель
+    // Панель ввода
+    JPanel inputPanel = new JPanel(new GridLayout(2, 5, 5, 5));
+    JTextField nameField = new JTextField();
+    JTextField ageField = new JTextField();
+    JTextField educationField = new JTextField();
+    JTextField worksField = new JTextField();
 
-    // Попытка подключения к базе данных
+    inputPanel.add(new JLabel("Имя"));
+    inputPanel.add(new JLabel("Возраст"));
+    inputPanel.add(new JLabel("Образование"));
+    inputPanel.add(new JLabel("Работа"));
+    inputPanel.add(new JLabel()); // пустая ячейка
+
+    inputPanel.add(nameField);
+    inputPanel.add(ageField);
+    inputPanel.add(educationField);
+    inputPanel.add(worksField);
+
+    JButton addButton = new JButton("Добавить");
+    inputPanel.add(addButton);
+
+    // Загрузка данных из БД
     try (Connection connection = DriverManager.getConnection(url, user, password)) {
-      // Запрос к базе данных
-      String sql = "SELECT id, name, age, education, works FROM [user]";  // пример запроса
+      String sql = "SELECT id, name, age, education, works FROM [user]";
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
-
-      // Заполнение модели данными из базы данных
       while (resultSet.next()) {
         int id = resultSet.getInt("id");
         String name = resultSet.getString("name");
@@ -43,14 +59,55 @@ public class Form {
       e.printStackTrace();
     }
 
-    // Создание JTable
-    JTable table = new JTable(model);
-    JScrollPane scrollPane = new JScrollPane(table); // добавляем прокрутку
+    // Обработчик кнопки добавления
+    addButton.addActionListener(e -> {
+      String name = nameField.getText().trim();
+      String ageText = ageField.getText().trim();
+      String education = educationField.getText().trim();
+      String works = worksField.getText().trim();
 
-    // Добавление таблицы в форму
+      if (name.isEmpty() || ageText.isEmpty()) {
+        JOptionPane.showMessageDialog(frame, "Имя и возраст обязательны!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+
+      try {
+        int age = Integer.parseInt(ageText);
+
+        try (Connection connection = DriverManager.getConnection(url, user, password)) {
+          String insertSql = "INSERT INTO [user] (name, age, education, works) VALUES (?, ?, ?, ?)";
+          PreparedStatement preparedStatement = connection.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+          preparedStatement.setString(1, name);
+          preparedStatement.setInt(2, age);
+          preparedStatement.setString(3, education);
+          preparedStatement.setString(4, works);
+          preparedStatement.executeUpdate();
+
+          ResultSet keys = preparedStatement.getGeneratedKeys();
+          int newId = -1;
+          if (keys.next()) {
+            newId = keys.getInt(1); // Получаем сгенерированный ID
+          }
+
+          model.addRow(new Object[]{newId, name, age, education, works});
+          nameField.setText("");
+          ageField.setText("");
+          educationField.setText("");
+          worksField.setText("");
+        }
+
+      } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(frame, "Возраст должен быть числом!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+      } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(frame, "Ошибка при добавлении в базу данных", "Ошибка", JOptionPane.ERROR_MESSAGE);
+      }
+    });
+
+    // Добавляем всё в окно
+    frame.setLayout(new BorderLayout(10, 10));
     frame.add(scrollPane, BorderLayout.CENTER);
-
-    // Отображение формы
+    frame.add(inputPanel, BorderLayout.SOUTH);
     frame.setVisible(true);
   }
 }
