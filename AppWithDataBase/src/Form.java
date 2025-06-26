@@ -104,7 +104,36 @@ public class Form {
       }
     });
 
-    // Добавляем всё в окно
+    JButton deleteButton = new JButton("Удалить");
+    inputPanel.add(deleteButton);  // Добавляем кнопку на панель
+
+// Обработчик кнопки удаления
+    deleteButton.addActionListener(e -> {
+      int selectedRow = table.getSelectedRow();
+      if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(frame, "Выберите строку для удаления!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+
+      int confirm = JOptionPane.showConfirmDialog(frame, "Вы уверены, что хотите удалить эту запись?", "Подтверждение", JOptionPane.YES_NO_OPTION);
+      if (confirm != JOptionPane.YES_OPTION) return;
+
+      int id = (int) model.getValueAt(selectedRow, 0); // Получаем ID из первой колонки
+
+      try (Connection connection = DriverManager.getConnection(url, user, password)) {
+        String deleteSql = "DELETE FROM [user] WHERE id = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(deleteSql);
+        preparedStatement.setInt(1, id);
+        preparedStatement.executeUpdate();
+
+        model.removeRow(selectedRow); // Удаляем из таблицы
+
+      } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(frame, "Ошибка при удалении из базы данных", "Ошибка", JOptionPane.ERROR_MESSAGE);
+      }
+    });
+
     frame.setLayout(new BorderLayout(10, 10));
     frame.add(scrollPane, BorderLayout.CENTER);
     frame.add(inputPanel, BorderLayout.SOUTH);
