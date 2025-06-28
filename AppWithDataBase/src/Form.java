@@ -22,7 +22,7 @@ public class Form {
     JScrollPane scrollPane = new JScrollPane(table);
 
     // Панель ввода
-    JPanel inputPanel = new JPanel(new GridLayout(2, 5, 5, 5));
+    JPanel inputPanel = new JPanel(new GridLayout(3, 4, 5, 5));
     JTextField nameField = new JTextField();
     JTextField ageField = new JTextField();
     JTextField educationField = new JTextField();
@@ -32,7 +32,6 @@ public class Form {
     inputPanel.add(new JLabel("Возраст"));
     inputPanel.add(new JLabel("Образование"));
     inputPanel.add(new JLabel("Работа"));
-    inputPanel.add(new JLabel()); // пустая ячейка
 
     inputPanel.add(nameField);
     inputPanel.add(ageField);
