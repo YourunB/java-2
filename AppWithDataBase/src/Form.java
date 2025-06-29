@@ -104,9 +104,9 @@ public class Form {
     });
 
     JButton deleteButton = new JButton("Удалить");
-    inputPanel.add(deleteButton);  // Добавляем кнопку на панель
+    inputPanel.add(deleteButton);
 
-// Обработчик кнопки удаления
+    // Обработчик кнопки удаления
     deleteButton.addActionListener(e -> {
       int selectedRow = table.getSelectedRow();
       if (selectedRow == -1) {
