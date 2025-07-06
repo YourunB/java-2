@@ -21,7 +21,7 @@ public class Form {
     JTable table = new JTable(model);
     JScrollPane scrollPane = new JScrollPane(table);
 
-    // Панель ввода
+    // панель ввода
     JPanel inputPanel = new JPanel(new GridLayout(3, 4, 5, 5));
     JTextField nameField = new JTextField();
     JTextField ageField = new JTextField();
@@ -41,7 +41,7 @@ public class Form {
     JButton addButton = new JButton("Добавить");
     inputPanel.add(addButton);
 
-    // Загрузка данных из БД
+    // загрузка данных из БД
     try (Connection connection = DriverManager.getConnection(url, user, password)) {
       String sql = "SELECT id, name, age, education, works FROM [user]";
       Statement statement = connection.createStatement();
@@ -58,7 +58,7 @@ public class Form {
       e.printStackTrace();
     }
 
-    // Обработчик кнопки добавления
+    // обработчик кнопки добавления
     addButton.addActionListener(e -> {
       String name = nameField.getText().trim();
       String ageText = ageField.getText().trim();
@@ -85,7 +85,7 @@ public class Form {
           ResultSet keys = preparedStatement.getGeneratedKeys();
           int newId = -1;
           if (keys.next()) {
-            newId = keys.getInt(1); // Получаем сгенерированный ID
+            newId = keys.getInt(1); // получение сгенерированного ID
           }
 
           model.addRow(new Object[]{newId, name, age, education, works});
@@ -106,7 +106,7 @@ public class Form {
     JButton deleteButton = new JButton("Удалить");
     inputPanel.add(deleteButton);
 
-    // Обработчик кнопки удаления
+    // обработчик кнопки удаления
     deleteButton.addActionListener(e -> {
       int selectedRow = table.getSelectedRow();
       if (selectedRow == -1) {
@@ -117,7 +117,7 @@ public class Form {
       int confirm = JOptionPane.showConfirmDialog(frame, "Вы уверены, что хотите удалить эту запись?", "Подтверждение", JOptionPane.YES_NO_OPTION);
       if (confirm != JOptionPane.YES_OPTION) return;
 
-      int id = (int) model.getValueAt(selectedRow, 0); // Получаем ID из первой колонки
+      int id = (int) model.getValueAt(selectedRow, 0); // получение ID из первой колонки
 
       try (Connection connection = DriverManager.getConnection(url, user, password)) {
         String deleteSql = "DELETE FROM [user] WHERE id = ?";
@@ -125,7 +125,7 @@ public class Form {
         preparedStatement.setInt(1, id);
         preparedStatement.executeUpdate();
 
-        model.removeRow(selectedRow); // Удаляем из таблицы
+        model.removeRow(selectedRow); // удаление из таблицы
 
       } catch (SQLException ex) {
         ex.printStackTrace();
