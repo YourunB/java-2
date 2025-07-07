@@ -38,7 +38,6 @@ public class Form extends JFrame {
 
     loadButton.addActionListener(e -> loadData());
 
-    // Обработчик выбора строки в таблице категорий
     categoryTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
       public void valueChanged(ListSelectionEvent event) {
         if (!event.getValueIsAdjusting()) {
