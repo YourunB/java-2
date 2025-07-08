@@ -29,8 +29,8 @@ public class Form extends JFrame {
     loadButton = new JButton("Загрузить из БД");
 
     JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-        new JScrollPane(categoryTable),
-        new JScrollPane(itemTable));
+      new JScrollPane(categoryTable),
+      new JScrollPane(itemTable));
     splitPane.setDividerLocation(250);
 
     add(loadButton, BorderLayout.NORTH);
@@ -65,8 +65,8 @@ public class Form extends JFrame {
 
       while (rs.next()) {
         categoryModel.addRow(new Object[]{
-            rs.getInt("id"),
-            rs.getString("name")
+          rs.getInt("id"),
+          rs.getString("name")
         });
       }
 
@@ -86,9 +86,9 @@ public class Form extends JFrame {
       ResultSet rs = stmt.executeQuery();
       while (rs.next()) {
         itemModel.addRow(new Object[]{
-            rs.getInt("id"),
-            rs.getInt("category_id"),
-            rs.getString("name")
+          rs.getInt("id"),
+          rs.getInt("category_id"),
+          rs.getString("name")
         });
       }
       rs.close();
